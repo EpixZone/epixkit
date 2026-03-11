@@ -272,7 +272,9 @@
 
    var selected
    if (wallets.length === 0) {
-    return Promise.reject(new Error("No wallet detected. Install MetaMask, Rabby, Keplr, or another EVM wallet."))
+    // Show modal with install links, then reject when closed
+    await showModal(wallets)
+    return Promise.reject(new Error("No wallet detected"))
    }
 
    // Try to reconnect to previously used wallet
