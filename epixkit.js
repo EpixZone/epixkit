@@ -331,6 +331,41 @@
    }
   },
 
+  reconnect: async function() {
+   var pref = loadWalletPref()
+   if (!pref) return null
+
+   window.dispatchEvent(new Event("eip6963:requestProvider"))
+   await new Promise(function(r) { setTimeout(r, 50) })
+
+   var wallets = getWalletListInternal()
+   var saved = findSavedWallet(wallets)
+   if (!saved) return null
+
+   try {
+    var raw = saved.provider
+    // Silent check - no popup, just see if already authorized
+    var accounts = await raw.request({ method: "eth_accounts" })
+    if (!accounts || accounts.length === 0) return null
+
+    await switchChain(raw)
+
+    state.provider = raw
+    state.address = accounts[0]
+    state.walletName = saved.info.name
+    state.walletIcon = saved.info.icon
+
+    return {
+     provider: raw,
+     address: accounts[0],
+     walletName: saved.info.name,
+     walletIcon: saved.info.icon
+    }
+   } catch (err) {
+    return null
+   }
+  },
+
   disconnect: function() {
    state.provider = null
    state.address = null
