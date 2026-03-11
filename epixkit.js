@@ -13,6 +13,29 @@
  var styleInjected = false
  var modalInjected = false
  var modalResolve = null
+ var STORAGE_KEY = "epixkit_wallet"
+
+ function saveWalletPref(info) {
+  try { localStorage.setItem(STORAGE_KEY, info.rdns || info.uuid || info.name) } catch (e) {}
+ }
+
+ function loadWalletPref() {
+  try { return localStorage.getItem(STORAGE_KEY) } catch (e) { return null }
+ }
+
+ function clearWalletPref() {
+  try { localStorage.removeItem(STORAGE_KEY) } catch (e) {}
+ }
+
+ function findSavedWallet(wallets) {
+  var pref = loadWalletPref()
+  if (!pref) return null
+  for (var i = 0; i < wallets.length; i++) {
+   var info = wallets[i].info
+   if ((info.rdns && info.rdns === pref) || info.uuid === pref || info.name === pref) return wallets[i]
+  }
+  return null
+ }
 
  // EIP-6963 wallet discovery - start listening immediately
  window.addEventListener("eip6963:announceProvider", function(e) {
@@ -245,11 +268,18 @@
    var selected
    if (wallets.length === 0) {
     return Promise.reject(new Error("No wallet detected. Install MetaMask, Rabby, Keplr, or another EVM wallet."))
-   } else if (wallets.length === 1) {
-    selected = wallets[0]
-   } else {
-    selected = await showModal(wallets)
-    if (!selected) return Promise.reject(new Error("User cancelled"))
+   }
+
+   // Try to reconnect to previously used wallet
+   selected = findSavedWallet(wallets)
+
+   if (!selected) {
+    if (wallets.length === 1) {
+     selected = wallets[0]
+    } else {
+     selected = await showModal(wallets)
+     if (!selected) return Promise.reject(new Error("User cancelled"))
+    }
    }
 
    showConnecting(selected.info.name)
@@ -267,11 +297,12 @@
     var accounts = await raw.request({ method: "eth_accounts" })
     var address = accounts[0]
 
-    // Store state
+    // Store state + remember wallet choice
     state.provider = raw
     state.address = address
     state.walletName = selected.info.name
     state.walletIcon = selected.info.icon
+    saveWalletPref(selected.info)
 
     // Close modal
     var modal = document.getElementById("epixkit-modal")
@@ -298,6 +329,7 @@
    state.address = null
    state.walletName = null
    state.walletIcon = null
+   clearWalletPref()
   },
 
   isConnected: function() {
