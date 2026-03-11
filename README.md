@@ -46,7 +46,7 @@ Configure the library. Call once before `connect()`.
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `chainId` | `string` | Hex chain ID (required). `"0x77D"` for testnet, `"0x779"` for mainnet |
+| `chainId` | `string` | Hex chain ID (required). `"0x77D"` for testnet, `"0x77C"` for mainnet |
 | `chainName` | `string` | Human-readable chain name |
 | `rpcUrls` | `string[]` | RPC endpoints for `wallet_addEthereumChain` |
 | `blockExplorerUrls` | `string[]` | Block explorer URLs |
@@ -83,7 +83,7 @@ Returns all discovered wallets (after filtering excluded ones) without connectin
 
 | Network | Chain ID | Hex |
 |---------|----------|-----|
-| Epix Mainnet | 1913 | `0x779` |
+| Epix Mainnet | 1916 | `0x77C` |
 | Epix Testnet | 1917 | `0x77D` |
 
 ## How It Works
