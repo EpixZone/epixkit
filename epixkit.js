@@ -259,6 +259,15 @@
  window.EpixKit = {
   init: function(cfg) {
    config = cfg || {}
+   if (config.onReconnect) {
+    var cb = config.onReconnect
+    ;(async function() {
+     try {
+      var result = await window.EpixKit.reconnect()
+      if (result) cb(result)
+     } catch (err) {}
+    })()
+   }
   },
 
   connect: async function() {
