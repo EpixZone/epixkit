@@ -15,7 +15,7 @@ EpixKit.init({
   nativeCurrency: { name: "EPIX", symbol: "EPIX", decimals: 18 },
   rpcUrls: ["https://evmrpc.testnet.epix.zone"],
   blockExplorerUrls: ["https://testscan.epix.zone"],
-  excludeWallets: ["phantom"]
+  // excludeWallets: ["someOtherWallet"]  // optional, Phantom excluded by default
 })
 
 document.getElementById("connect-btn").onclick = async function() {
@@ -51,7 +51,7 @@ Configure the library. Call once before `connect()`.
 | `rpcUrls` | `string[]` | RPC endpoints for `wallet_addEthereumChain` |
 | `blockExplorerUrls` | `string[]` | Block explorer URLs |
 | `nativeCurrency` | `object` | `{ name, symbol, decimals }` |
-| `excludeWallets` | `string[]` | Wallet names or RDNS strings to hide (e.g. `["phantom"]`) |
+| `excludeWallets` | `string[]` | Additional wallet names or RDNS strings to hide. Phantom is excluded by default. |
 
 ### `EpixKit.connect()` -> `Promise<{provider, address, walletName, walletIcon}>`
 

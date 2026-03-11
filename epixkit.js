@@ -7,6 +7,7 @@
  "use strict"
 
  var config = null
+ var defaultExclude = ["phantom", "app.phantom"]
  var state = { provider: null, address: null, walletName: null, walletIcon: null }
  var discoveredWallets = {}
  var styleInjected = false
@@ -34,11 +35,11 @@
  }
 
  function isExcluded(info) {
-  if (!config || !config.excludeWallets) return false
+  var exclude = defaultExclude.concat(config && config.excludeWallets ? config.excludeWallets : [])
   var name = (info.name || "").toLowerCase()
   var rdns = (info.rdns || "").toLowerCase()
-  for (var i = 0; i < config.excludeWallets.length; i++) {
-   var ex = config.excludeWallets[i].toLowerCase()
+  for (var i = 0; i < exclude.length; i++) {
+   var ex = exclude[i].toLowerCase()
    if (name.indexOf(ex) !== -1 || rdns.indexOf(ex) !== -1) return true
   }
   return false
