@@ -129,7 +129,9 @@
    " width: 20px; height: 20px; border: 2px solid #30363d; border-top-color: #58a6ff;",
    " border-radius: 50%; animation: epixkit-spin 0.8s linear infinite;",
    "}",
-   "@keyframes epixkit-spin { to { transform: rotate(360deg); } }"
+   "@keyframes epixkit-spin { to { transform: rotate(360deg); } }",
+   ".epixkit-empty a { color: #58a6ff; text-decoration: none; }",
+   ".epixkit-empty a:hover { text-decoration: underline; }"
   ].join("\n")
   document.head.appendChild(style)
  }
@@ -146,8 +148,11 @@
    '  <button class="epixkit-close">&times;</button>',
    '  <h3>Connect Wallet</h3>',
    '  <div id="epixkit-list"></div>',
-   '  <div id="epixkit-empty" style="display:none;color:#8b949e;font-size:0.85em;text-align:center;padding:20px 0;">',
-   '   No wallets detected.<br>Install MetaMask, Rabby, Keplr, or another EVM wallet.',
+   '  <div id="epixkit-empty" class="epixkit-empty" style="display:none;color:#8b949e;font-size:0.85em;text-align:center;padding:20px 0;">',
+   '   No wallets detected.<br>Install ',
+   '   <a href="https://metamask.io/download/" target="_blank">MetaMask</a>, ',
+   '   <a href="https://rabby.io/" target="_blank">Rabby</a>, ',
+   '   <a href="https://www.keplr.app/get" target="_blank">Keplr</a>, or another EVM wallet.',
    '  </div>',
    ' </div>',
    '</div>'
