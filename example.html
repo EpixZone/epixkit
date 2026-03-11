@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>EpixKit Example</title>
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+   background: #0d1117; color: #e0e0e0; padding: 40px 20px;
+  }
+  .container { max-width: 500px; margin: 0 auto; }
+  h1 { font-size: 1.5em; margin-bottom: 8px; }
+  p.subtitle { color: #8b949e; font-size: 0.9em; margin-bottom: 24px; }
+  .card {
+   background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 20px;
+  }
+  button {
+   padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.9em;
+   cursor: pointer; font-weight: 600;
+  }
+  .btn-connect { background: #6e40c9; color: #fff; }
+  .btn-connect:hover { background: #8957e5; }
+  .btn-disconnect { background: #da3633; color: #fff; margin-left: 8px; }
+  .btn-disconnect:hover { background: #f85149; }
+  #status { margin-top: 16px; font-size: 0.85em; color: #8b949e; }
+  #address { color: #58a6ff; font-family: monospace; word-break: break-all; }
+  #error { color: #f85149; margin-top: 8px; font-size: 0.85em; }
+ </style>
+</head>
+<body>
+
+<div class="container">
+ <h1>EpixKit Example</h1>
+ <p class="subtitle">Minimal wallet connection demo</p>
+
+ <div class="card">
+  <div id="disconnected">
+   <button class="btn-connect" onclick="doConnect()">Connect Wallet</button>
+   <div id="error"></div>
+  </div>
+  <div id="connected" style="display:none;">
+   <div>Connected: <span id="wallet-name"></span></div>
+   <div id="address" style="margin-top:6px;"></div>
+   <div style="margin-top:12px;">
+    <button class="btn-connect" onclick="doSend()">Send 0.001 EPIX to self</button>
+    <button class="btn-disconnect" onclick="doDisconnect()">Disconnect</button>
+   </div>
+  </div>
+  <div id="status"></div>
+ </div>
+</div>
+
+<script src="epixkit.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script>
+
+EpixKit.init({
+ chainId: "0x77D",
+ chainName: "Epix Testnet",
+ nativeCurrency: { name: "EPIX", symbol: "EPIX", decimals: 18 },
+ rpcUrls: ["https://evmrpc.testnet.epix.zone"],
+ blockExplorerUrls: ["https://testscan.epix.zone"],
+ excludeWallets: ["phantom"]
+})
+
+async function doConnect() {
+ document.getElementById("error").textContent = ""
+ try {
+  var result = await EpixKit.connect()
+
+  document.getElementById("wallet-name").textContent = result.walletName
+  document.getElementById("address").textContent = result.address
+  document.getElementById("disconnected").style.display = "none"
+  document.getElementById("connected").style.display = "block"
+ } catch (err) {
+  document.getElementById("error").textContent = err.message
+ }
+}
+
+function doDisconnect() {
+ EpixKit.disconnect()
+ document.getElementById("disconnected").style.display = "block"
+ document.getElementById("connected").style.display = "none"
+ document.getElementById("status").textContent = ""
+}
+
+async function doSend() {
+ var status = document.getElementById("status")
+ status.textContent = "Sending..."
+ try {
+  var provider = new ethers.BrowserProvider(EpixKit.getProvider())
+  var signer = await provider.getSigner()
+  var tx = await signer.sendTransaction({
+   to: EpixKit.getAddress(),
+   value: ethers.parseEther("0.001")
+  })
+  status.textContent = "Tx sent: " + tx.hash
+  await tx.wait()
+  status.textContent = "Confirmed: " + tx.hash
+ } catch (err) {
+  status.textContent = "Error: " + err.message
+ }
+}
+
+</script>
+</body>
+</html>
