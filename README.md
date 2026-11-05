@@ -58,6 +58,7 @@ Configure the library. Call once before `connect()`.
 | `installUrl` | `string` | Optional download link shown when no wallet is installed. Without it the empty state points at the EpixNet browser, which includes the Epix Wallet. |
 | `installLabel` | `string` | Link text for `installUrl` |
 | `onReconnect` | `function` | Called with the connect result when the wallet used last time is still authorized on page load |
+| `requestTimeoutMs` | `number` | Maximum wait for each connection/network request, in milliseconds. Defaults to 60000. |
 
 ### `EpixKit.connect()` -> `Promise<{provider, address, walletName, walletIcon}>`
 
@@ -67,6 +68,15 @@ Opens the wallet picker and connects. Returns the raw EIP-1193 provider, connect
 - Otherwise the picker always shows, even with a single installed wallet, so the user sees which wallet is about to connect. The Epix Wallet is listed first.
 - If no wallets are detected, the picker shows the empty state and the promise rejects.
 - If the user closes the picker, the promise rejects.
+- Closing the connecting dialog also rejects the attempt. A late wallet response cannot complete a cancelled connection.
+- An unresponsive wallet request times out with an explanation. This does not dismiss a wallet's own prompt; close that prompt before retrying.
+
+Opaque sandboxed frames can block an installed wallet's message transport. A
+timeout in that context explains the limitation and suggests the desktop EpixNet
+browser's isolated `.epix` address. This does not grant sandbox permissions or
+forward wallet requests through another page's origin.
+
+Run the connection regression tests with `node --test tests/*.test.cjs`.
 
 ### `EpixKit.disconnect()`
 
