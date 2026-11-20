@@ -76,11 +76,25 @@ timeout in that context explains the limitation and suggests the desktop EpixNet
 browser's isolated `.epix` address. This does not grant sandbox permissions or
 forward wallet requests through another page's origin.
 
+The picker is a modal dialog (`role="dialog"`, `aria-modal="true"`). Opening it moves keyboard focus to its close button, Tab and Shift+Tab stay inside it, Escape closes it (rejecting the attempt like the close button does), and focus returns to the element that had it before the picker opened.
+
 Run the connection regression tests with `node --test tests/*.test.cjs`.
+
+### `EpixKit.reconnect()` -> `Promise<{provider, address, walletName, walletIcon} | null>`
+
+Restores the wallet used last time without showing the picker. It looks up the remembered wallet and asks it for `eth_accounts`, which does not open a connection prompt, then switches to the configured chain (a wallet on another network may ask the user to approve the switch) and resolves with the same result shape as `connect()`.
+
+Resolves `null` (it never rejects) when no wallet was remembered, the remembered wallet is not installed, it no longer shares an account with this page, or any request fails or times out. The `onReconnect` option of `init()` calls this on page load for you.
+
+```javascript
+var result = await EpixKit.reconnect()
+if (result) showConnected(result.address)
+else showConnectButton()
+```
 
 ### `EpixKit.disconnect()`
 
-Clears internal connection state.
+Clears internal connection state and forgets the remembered wallet, so the next `connect()` shows the picker and `reconnect()` resolves `null`.
 
 ### `EpixKit.isConnected()` -> `boolean`
 
